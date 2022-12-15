@@ -7,7 +7,7 @@ Your are lazy and can not remember ssh connection? Then this is for you! This is
 * copy sshko.sh and put it where you want (I put it in user home dir ~/)
 * make an alias
 ```
-alias sshko="~/sshko.sh $1"
+alias sshko="~/sshko.sh $@"
 ```
 * try it:
 ```
