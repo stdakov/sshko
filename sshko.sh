@@ -43,6 +43,7 @@ if [ "$1" == "" ] || [ $# -gt 1 ]; then
         sshHost=${val[$CHOICE]}
         echo "$CHOICE You chose ${sshHost}"
         ssh ${sshHost}
+        exit
     fi
 else
     sshHost=$1
@@ -52,4 +53,5 @@ else
     fi
 
     ssh ${sshHost}
+    exit
 fi
