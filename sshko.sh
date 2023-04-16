@@ -7,13 +7,12 @@ if [[ ! -e ${logFile} ]]; then
     touch ${logFile}
 fi
 
-if [ "$1" == "" ] || [ $# -gt 1 ]; 
-then
-    if ! [ -s ${logFile} ];then
+if [ "$1" == "" ] || [ $# -gt 1 ]; then
+    if ! [ -s ${logFile} ]; then
         echo "ssh log file is empty"
         exit
     fi
-    
+
     HEIGHT=20
     WIDTH=40
     CHOICE_HEIGHT=9
@@ -21,38 +20,35 @@ then
     TITLE="SSHko"
     MENU="Choose one of the following ssh connections:"
 
-    readarray rows < ${logFile}
-    #rows2=$(nl ${logFile})
+    arr=()
+    val=()
+    key=0
+    while IFS= read -r line || [[ "$line" ]]; do
+        arr+=($key "$line")
+        val+=("$line")
+        ((key = key + 1))
+    done <${logFile}
 
-    choices=();
-    for key in "${!rows[@]}";
-    do
-        #choices+=($($key+1) "${rows[$key]}");
-        choices+=($key "${rows[$key]}");
-    done;
+    for key in "${!arr[@]}"; do
+        echo ${arr[$key]}
+    done
 
-    CHOICE=$(whiptail --clear \
-                    --backtitle "$BACKTITLE" \
-                    --title "$TITLE" \
-                    --menu "$MENU" \
-                    $HEIGHT $WIDTH $CHOICE_HEIGHT \
-                    -- "${choices[@]}"   \
-                    2>&1 >/dev/tty)
+    echo ${#arr[@]}
 
+    CHOICE=$(dialog --clear --title "$TITLE" --backtitle "$BACKTITLE"\
+        --menu "$MENU" $HEIGHT $WIDTH $CHOICE_HEIGHT "${arr[@]}" \
+        2>&1 >/dev/tty)
     clear
-    if [[ ! $CHOICE == "" ]]
-    then
-        sshHost=${rows[$CHOICE]}
+    if [[ ! $CHOICE == "" ]]; then
+        sshHost=${val[$CHOICE]}
         echo "$CHOICE You chose ${sshHost}"
         ssh ${sshHost}
-            #ssh ${sshHost}
     fi
 else
-    sshHost=$1;
+    sshHost=$1
     # echo ${sshHost} >> ${logFile}
-    if ! grep -Fxq "$sshHost" ${logFile}
-    then
-        echo ${sshHost} >> ${logFile}
+    if ! grep -Fxq "$sshHost" ${logFile}; then
+        echo ${sshHost} >>${logFile}
     fi
 
     ssh ${sshHost}
